@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>STOP JUDI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #16a34a;
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+
+        .days-counter {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .days-counter .number {
+            font-size: 72px;
+            font-weight: bold;
+            color: #16a34a;
+            line-height: 1;
+        }
+
+        .days-counter .label {
+            color: #666;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-item .number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #16a34a;
+        }
+
+        .stat-item .label {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s;
+            margin-bottom: 12px;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-success {
+            background: #16a34a;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #16a34a;
+            color: #16a34a;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+        }
+
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            cursor: pointer;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .nav-item.active {
+            color: #16a34a;
+        }
+
+        .nav-item .icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .reason-item {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .reason-item .text {
+            flex: 1;
+            color: #333;
+        }
+
+        .reason-item .delete {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e5e5;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #16a34a;
+        }
+
+        .calendar-day {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 3px;
+            background: #f8f8f8;
+            cursor: pointer;
+        }
+
+        .calendar-day.checked {
+            background: #16a34a;
+            color: white;
+        }
+
+        .calendar-day.today {
+            border: 2px solid #16a34a;
+        }
+
+        .motivation-text {
+            font-size: 18px;
+            color: #333;
+            text-align: center;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .timer-display {
+            font-size: 48px;
+            font-weight: bold;
+            color: #16a34a;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .success-message {
+            background: #16a34a;
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>STOP JUDI</h1>
+            <p>Satu hari demi satu hari.</p>
+        </div>
+
+        <!-- Dashboard Page -->
+        <div id="page-dashboard" class="page active">
+            <div class="card">
+                <div class="days-counter">
+                    <div class="number" id="days-free">0</div>
+                    <div class="label">Hari Bebas Judi</div>
+                </div>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <div class="number" id="current-streak">0</div>
+                        <div class="label">Streak Saat Ini</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="number" id="total-checkins">0</div>
+                        <div class="label">Total Check-in</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-success" onclick="checkIn()">✓ SAYA BERHASIL HARI INI</button>
+            <button class="btn btn-warning" onclick="showPage('craving')">⚠️ SAYA SEDANG INGIN JUDI</button>
+        </div>
+
+        <!-- History Page -->
+        <div id="page-history" class="page">
+            <div class="card">
+                <h2>Riwayat Check-in</h2>
+                <div id="calendar"></div>
+            </div>
+            <div class="card">
+                <h2>Statistik</h2>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <div class="number" id="total-days">0</div>
+                        <div class="label">Total Hari Bebas</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="number" id="best-streak">0</div>
+                        <div class="label">Streak Terbaik</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Motivation Page -->
+        <div id="page-motivation" class="page">
+            <div class="card">
+                <h2>Motivasi Hari Ini</h2>
+                <div class="motivation-text" id="motivation-text">
+                    Loading...
+                </div>
+                <button class="btn btn-outline" onclick="showMotivation()">🔄 Ganti Motivasi</button>
+            </div>
+        </div>
+
+        <!-- Craving Page -->
+        <div id="page-craving" class="page">
+            <div class="card">
+                <h2>TUNGGU DULU.</h2>
+                <p style="color: #666; margin-bottom: 20px;">Jangan ambil keputusan sekarang.</p>
+                <div class="timer-display" id="timer">30:00</div>
+                <p style="color: #666; text-align: center; margin-bottom: 20px;">
+                    Keinginan ini akan berlalu. Kamu tidak harus mengikutinya.
+                </p>
+                <button class="btn btn-success" onclick="startTimer()">⏱️ Tunda 30 Menit</button>
+                <button class="btn btn-outline" onclick="showPage('reasons')">📖 Baca Alasan Saya Berhenti</button>
+                <button class="btn btn-secondary hidden" id="complete-craving" onclick="completeCraving()">✅ Saya Berhasil Melewati Keinginan Ini</button>
+            </div>
+        </div>
+
+        <!-- Reasons Page -->
+        <div id="page-reasons" class="page">
+            <div class="card">
+                <h2>Alasan Saya Berhenti</h2>
+                <div id="reasons-list"></div>
+                <div class="input-group" style="margin-top: 20px;">
+                    <textarea id="new-reason" rows="3" placeholder="Tambah alasan baru..."></textarea>
+                    <button class="btn btn-success" onclick="addReason()">➕ Tambah Alasan</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Page -->
+        <div id="page-profile" class="page">
+            <div class="card">
+                <h2>Profil Saya</h2>
+                <div class="input-group">
+                    <label>Nama</label>
+                    <input type="text" id="profile-name" placeholder="Nama Anda">
+                </div>
+                <div class="input-group">
+                    <label>Tanggal Mulai Berhenti</label>
+                    <input type="date" id="profile-start-date">
+                </div>
+                <button class="btn btn-success" onclick="saveProfile()">💾 Simpan Profil</button>
+            </div>
+            <div class="card">
+                <h2>Statistik</h2>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <div class="number" id="profile-days">0</div>
+                        <div class="label">Hari Bebas Judi</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="number" id="profile-streak">0</div>
+                        <div class="label">Streak Terbaik</div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-danger" onclick="resetData()">⚠️ Reset Semua Data</button>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="showPage('dashboard')">
+            <div class="icon">🏠</div>
+            <div>Beranda</div>
+        </div>
+        <div class="nav-item" onclick="showPage('history')">
+            <div class="icon">📊</div>
+            <div>Riwayat</div>
+        </div>
+        <div class="nav-item" onclick="showPage('motivation')">
+            <div class="icon">💪</div>
+            <div>Motivasi</div>
+        </div>
+        <div class="nav-item" onclick="showPage('profile')">
+            <div class="icon">👤</div>
+            <div>Profil</div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize data
+        let data = JSON.parse(localStorage.getItem('stopJudiData')) || {
+            name: '',
+            startDate: new Date().toISOString().split('T')[0],
+            checkins: [],
+            reasons: [],
+            cravingSessions: [],
+            bestStreak: 0
+        };
+
+        const motivations = [
+            "Hari ini tidak perlu sempurna. Cukup jangan berjudi.",
+            "Jangan pertaruhkan masa depan untuk kesenangan sesaat.",
+            "Satu hari bebas judi adalah satu langkah menuju kehidupan yang lebih baik.",
+            "Bukan harus menang melawan judi. Yang penting berhenti memainkannya.",
+            "Setiap hari tanpa judi adalah kemenangan.",
+            "Kamu lebih kuat dari keinginan untuk berjudi.",
+            "Pikirkan tentang masa depan yang lebih baik tanpa judi.",
+            "Uang yang kamu hemat adalah masa depan yang kamu bangun.",
+            "Keluargamu bangga pada kamu yang berhenti berjudi.",
+            "Satu hari lagi tanpa judi. Kamu bisa melakukannya!",
+            "Jangan biarkan judi mengendalikan hidupmu.",
+            "Kamu layak hidup lebih baik tanpa beban judi.",
+            "Setiap detik tanpa judi adalah kemenangan.",
+            "Pikirkan semua hal baik yang bisa kamu lakukan dengan uang itu.",
+            "Kamu sudah melewati hari-hari sulit. Lanjutkan!",
+            "Jangan menyerah. Kamu sudah sejauh ini.",
+            "Hari ini adalah kesempatan baru untuk menjadi lebih baik.",
+            "Setiap check-in adalah bukti kekuatanmu.",
+            "Kamu tidak sendirian dalam perjuangan ini.",
+            "Lihat seberapa jauh kamu sudah melangkah. Tetap semangat!"
+        ];
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('stopJudiData', JSON.stringify(data));
+        }
+
+        // Show page
+        function showPage(pageName) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById('page-' + pageName).classList.add('active');
+
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+
+            if (pageName === 'dashboard') updateDashboard();
+            if (pageName === 'history') updateHistory();
+            if (pageName === 'motivation') showMotivation();
+            if (pageName === 'reasons') updateReasons();
+            if (pageName === 'profile') updateProfile();
+        }
+
+        // Calculate days free
+        function calculateDaysFree() {
+            const start = new Date(data.startDate);
+            const today = new Date();
+            const diffTime = Math.abs(today - start);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays;
+        }
+
+        // Calculate current streak
+        function calculateStreak() {
+            if (data.checkins.length === 0) return 0;
+
+            const sortedCheckins = [...data.checkins].sort((a, b) => new Date(b) - new Date(a));
+            let streak = 0;
+            let currentDate = new Date();
+
+            for (let i = 0; i < sortedCheckins.length; i++) {
+                const checkinDate = new Date(sortedCheckins[i]);
+                const diffDays = Math.floor((currentDate - checkinDate) / (1000 * 60 * 60 * 24));
+
+                if (diffDays === streak) {
+                    streak++;
+                    currentDate = new Date(checkinDate);
+                } else {
+                    break;
+                }
+            }
+
+            return streak;
+        }
+
+        // Update dashboard
+        function updateDashboard() {
+            document.getElementById('days-free').textContent = calculateDaysFree();
+            document.getElementById('current-streak').textContent = calculateStreak();
+            document.getElementById('total-checkins').textContent = data.checkins.length;
+        }
+
+        // Check in
+        function checkIn() {
+            const today = new Date().toISOString().split('T')[0];
+            if (data.checkins.includes(today)) {
+                alert('Anda sudah check-in hari ini!');
+                return;
+            }
+
+            data.checkins.push(today);
+            const currentStreak = calculateStreak();
+            if (currentStreak > data.bestStreak) {
+                data.bestStreak = currentStreak;
+            }
+            saveData();
+            updateDashboard();
+            alert('✅ Check-in berhasil! Tetap semangat!');
+        }
+
+        // Update history
+        function updateHistory() {
+            const calendar = document.getElementById('calendar');
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            let html = '';
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isToday = day === today.getDate();
+                const isChecked = data.checkins.includes(dateStr);
+
+                html += `<div class="calendar-day ${isChecked ? 'checked' : ''} ${isToday ? 'today' : ''}">${day}</div>`;
+            }
+            calendar.innerHTML = html;
+
+            document.getElementById('total-days').textContent = calculateDaysFree();
+            document.getElementById('best-streak').textContent = data.bestStreak;
+        }
+
+        // Show motivation
+        function showMotivation() {
+            const randomIndex = Math.floor(Math.random() * motivations.length);
+            document.getElementById('motivation-text').textContent = motivations[randomIndex];
+        }
+
+        // Timer functionality
+        let timerInterval;
+        let timerSeconds = 30 * 60;
+
+        function startTimer() {
+            if (timerInterval) return;
+
+            timerSeconds = 30 * 60;
+            document.getElementById('complete-craving').classList.remove('hidden');
+
+            timerInterval = setInterval(() => {
+                timerSeconds--;
+                const minutes = Math.floor(timerSeconds / 60);
+                const seconds = timerSeconds % 60;
+                document.getElementById('timer').textContent = 
+                    `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    alert('⏰ 30 menit telah berlalu! Keinginan akan berlalu. Kamu berhasil!');
+                }
+            }, 1000);
+        }
+
+        function completeCraving() {
+            data.cravingSessions.push(new Date().toISOString());
+            saveData();
+            clearInterval(timerInterval);
+            timerInterval = null;
+            alert('🎉 Kamu berhasil melewati satu dorongan!');
+            showPage('dashboard');
+        }
+
+        // Reasons functionality
+        function updateReasons() {
+            const list = document.getElementById('reasons-list');
+            list.innerHTML = '';
+
+            data.reasons.forEach((reason, index) => {
+                list.innerHTML += `
+                    <div class="reason-item">
+                        <div class="text">${reason}</div>
+                        <button class="delete" onclick="deleteReason(${index})">🗑️</button>
+                    </div>
+                `;
+            });
+        }
+
+        function addReason() {
+            const input = document.getElementById('new-reason');
+            const reason = input.value.trim();
+            if (reason) {
+                data.reasons.push(reason);
+                saveData();
+                input.value = '';
+                updateReasons();
+            }
+        }
+
+        function deleteReason(index) {
+            data.reasons.splice(index, 1);
+            saveData();
+            updateReasons();
+        }
+
+        // Profile functionality
+        function updateProfile() {
+            document.getElementById('profile-name').value = data.name;
+            document.getElementById('profile-start-date').value = data.startDate;
+            document.getElementById('profile-days').textContent = calculateDaysFree();
+            document.getElementById('profile-streak').textContent = data.bestStreak;
+        }
+
+        function saveProfile() {
+            data.name = document.getElementById('profile-name').value;
+            data.startDate = document.getElementById('profile-start-date').value;
+            saveData();
+            alert('✅ Profil berhasil disimpan!');
+        }
+
+        function resetData() {
+            if (confirm('Apakah Anda yakin ingin menghapus semua data? Tindakan ini tidak dapat dibatalkan.')) {
+                if (confirm('Konfirmasi sekali lagi: Semua data akan dihapus permanen.')) {
+                    localStorage.removeItem('stopJudiData');
+                    data = {
+                        name: '',
+                        startDate: new Date().toISOString().split('T')[0],
+                        checkins: [],
+                        reasons: [],
+                        cravingSessions: [],
+                        bestStreak: 0
+                    };
+                    updateProfile();
+                    alert('✅ Semua data telah direset.');
+                }
+            }
+        }
+
+        // Initialize
+        updateDashboard();
+        showMotivation();
+    </script>
+</body>
+</html>
