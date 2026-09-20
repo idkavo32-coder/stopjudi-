@@ -280,6 +280,88 @@
         .hidden {
             display: none;
         }
+
+        .chat-container {
+            height: calc(100vh - 200px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 20px;
+            margin-bottom: 15px;
+        }
+
+        .chat-message {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-message.user {
+            align-items: flex-end;
+        }
+
+        .chat-message.ai {
+            align-items: flex-start;
+        }
+
+        .chat-bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .chat-message.user .chat-bubble {
+            background: #16a34a;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-message.ai .chat-bubble {
+            background: white;
+            color: #333;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e5e5e5;
+            border-radius: 25px;
+            font-size: 14px;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #16a34a;
+        }
+
+        .chat-send {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .chat-send:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
 <body>
@@ -400,6 +482,23 @@
             </div>
             <button class="btn btn-danger" onclick="resetData()">⚠️ Reset Semua Data</button>
         </div>
+
+        <!-- Chat Page -->
+        <div id="page-chat" class="page">
+            <div class="card">
+                <h2>💬 Chat Dukungan</h2>
+                <p style="color: #666; margin-bottom: 15px; font-size: 14px;">
+                    Ceritakan apa yang Anda rasakan. Saya di sini untuk mendukung Anda.
+                </p>
+            </div>
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-messages"></div>
+                <div class="chat-input-container">
+                    <input type="text" class="chat-input" id="chat-input" placeholder="Ketik pesan..." onkeypress="if(event.key === 'Enter') sendMessage()">
+                    <button class="chat-send" onclick="sendMessage()">Kirim</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="bottom-nav">
@@ -415,6 +514,10 @@
             <div class="icon">💪</div>
             <div>Motivasi</div>
         </div>
+        <div class="nav-item" onclick="showPage('chat')">
+            <div class="icon">💬</div>
+            <div>Chat</div>
+        </div>
         <div class="nav-item" onclick="showPage('profile')">
             <div class="icon">👤</div>
             <div>Profil</div>
@@ -429,7 +532,8 @@
             checkins: [],
             reasons: [],
             cravingSessions: [],
-            bestStreak: 0
+            bestStreak: 0,
+            chatHistory: []
         };
 
         const motivations = [
@@ -477,6 +581,7 @@
             if (pageName === 'motivation') showMotivation();
             if (pageName === 'reasons') updateReasons();
             if (pageName === 'profile') updateProfile();
+            if (pageName === 'chat') initChat();
         }
 
         // Calculate days free
@@ -661,6 +766,139 @@
                     alert('✅ Semua data telah direset.');
                 }
             }
+        }
+
+        // Chat AI functionality
+        let chatInitialized = false;
+
+        function initChat() {
+            if (!chatInitialized) {
+                const messagesContainer = document.getElementById('chat-messages');
+                messagesContainer.innerHTML = '';
+
+                // Load chat history
+                if (data.chatHistory && data.chatHistory.length > 0) {
+                    data.chatHistory.forEach(msg => {
+                        addChatMessage(msg.type, msg.text, false);
+                    });
+                } else {
+                    // Welcome message
+                    addChatMessage('ai', 'Halo! Saya di sini untuk mendukung perjalanan Anda berhenti judi. Ceritakan apa yang Anda rasakan, dan saya akan membantu sebisanya. 💪', false);
+                }
+
+                chatInitialized = true;
+            }
+
+            // Scroll to bottom
+            const messagesContainer = document.getElementById('chat-messages');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // Add user message
+            addChatMessage('user', message, true);
+            input.value = '';
+
+            // Get AI response
+            setTimeout(() => {
+                const aiResponse = getAIResponse(message);
+                addChatMessage('ai', aiResponse, true);
+            }, 500);
+        }
+
+        function addChatMessage(type, text, saveToHistory) {
+            const messagesContainer = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${type}`;
+            messageDiv.innerHTML = `<div class="chat-bubble">${text}</div>`;
+            messagesContainer.appendChild(messageDiv);
+
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Save to history
+            if (saveToHistory) {
+                if (!data.chatHistory) data.chatHistory = [];
+                data.chatHistory.push({ type, text, timestamp: new Date().toISOString() });
+
+                // Keep only last 50 messages
+                if (data.chatHistory.length > 50) {
+                    data.chatHistory = data.chatHistory.slice(-50);
+                }
+
+                saveData();
+            }
+        }
+
+        function getAIResponse(userMessage) {
+            const message = userMessage.toLowerCase();
+            const daysFree = calculateDaysFree();
+            const streak = calculateStreak();
+            const userName = data.name || 'Teman';
+
+            // Check for keywords and provide contextual responses
+            if (message.includes('ingin') || message.includes('mau') || message.includes('judi')) {
+                const responses = [
+                    `Saya mengerti perasaanmu, ${userName}. Keinginan ini normal dan akan berlalu. Kamu sudah kuat selama ${daysFree} hari! Coba gunakan timer 30 menit untuk menunda.`,
+                    `Ini pertanda bahwa kamu sedang berjuang, ${userName}. Tapi ingat, kamu sudah melewati ${daysFree} hari tanpa judi. Keinginan ini akan lewat. Kamu bisa melakukannya!`,
+                    `${userName}, keinginan ini hanya sementara. Kamu sudah memiliki streak ${streak} hari! Pikirkan alasan-alasanmu berhenti. Kamu lebih kuat dari ini.`,
+                    `Saya di sini untukmu, ${userName}. Keinginan judi akan berlalu. Kamu sudah bebas selama ${daysFree} hari - itu pencapaian luar biasa!`
+                ];
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+
+            if (message.includes('sedih') || message.includes('nangis') || message.includes('kecewa')) {
+                const responses = [
+                    `Saya turut sedih mendengar itu, ${userName}. Tapi ingat, setiap hari tanpa judi adalah kemenangan. Kamu tidak sendirian dalam perjuangan ini.`,
+                    `${userName}, saya mengerti perasaanmu. Kadang hari-hari sulit datang. Tapi kamu sudah kuat sampai sejauh ini. Mari kita lewati ini bersama.`,
+                    `Tidak apa-apa untuk merasa sedih, ${userName}. Yang penting adalah kamu tidak menyerah. Kamu sudah bebas judi selama ${daysFree} hari - itu bukti kekuatanmu.`
+                ];
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+
+            if (message.includes('marah') || message.includes('kesal') || message.includes('jengkel')) {
+                const responses = [
+                    `Marah itu wajar, ${userName}. Yang penting adalah bagaimana Anda menyalurkannya. Coba tidur sebentar atau lakukan aktivitas yang positif.`,
+                    `${userName}, saya mengerti kemarahanmu. Tapi jangan biarkan kemarahan ini mendorongmu kembali ke judi. Kamu sudah terlalu jauh untuk menyerah sekarang.`,
+                    `Ini normal, ${userName}. Kemarahan bisa datang kapan saja. Yang penting adalah Anda tetap fokus pada tujuanmu. Kamu sudah kuat selama ${daysFree} hari!`
+                ];
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+
+            if (message.includes('hari') || message.includes('berapa') || message.includes('lama')) {
+                return `${userName}, kamu sudah bebas judi selama ${daysFree} hari! Streak kamu saat ini adalah ${streak} hari. Luar biasa! Pertahankan prestasi ini! 💪`;
+            }
+
+            if (message.includes('bantuan') || message.includes('tolong') || message.includes('help')) {
+                return `Saya di sini untuk membantu, ${userName}! Ceritakan apa yang Anda rasakan atau butuhkan. Saya akan memberikan dukungan sebisanya. Ingat, kamu sudah bebas selama ${daysFree} hari - itu pencapaian luar biasa!`;
+            }
+
+            if (message.includes('motivasi') || message.includes('semangat') || message.includes('inspirasi')) {
+                const randomMotivation = motivations[Math.floor(Math.random() * motivations.length)];
+                return `${randomMotivation} Kamu sudah kuat selama ${daysFree} hari, ${userName}! Tetap semangat! 💪`;
+            }
+
+            if (message.includes('tips') || message.includes('saran') || message.includes('cara')) {
+                return `Beberapa tips untuk ${userName}: 1) Gunakan timer 30 menit saat ingin judi. 2) Baca alasan-alasanmu berhenti. 3) Hubungi teman atau keluarga. 4) Lakukan aktivitas yang menyibukkan. 5) Ingat kamu sudah bebas ${daysFree} hari!`;
+            }
+
+            if (message.includes('terima kasih') || message.includes('makasih') || message.includes('thanks')) {
+                return `Sama-sama, ${userName}! Saya senang bisa membantu. Ingat, saya selalu di sini untuk mendukung perjalananmu. Kamu sudah hebat! 💪`;
+            }
+
+            // Default response
+            const defaultResponses = [
+                `Saya mengerti, ${userName}. Ceritakan lebih banyak? Saya di sini untuk mendukungmu.`,
+                `${userName}, saya di sini untuk mendengarkan. Apa lagi yang ingin Anda ceritakan?`,
+                `Terima kasih sudah berbagi, ${userName}. Saya di sini untuk membantu. Apa yang bisa saya lakukan untuk Anda?`,
+                `${userName}, Anda sudah melakukan hebat dengan ${daysFree} hari bebas judi. Terus ceritakan, saya di sini untuk mendukung.`
+            ];
+            return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
         }
 
         // Initialize
